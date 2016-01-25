@@ -73,8 +73,8 @@ public class Mandelbrot extends JavaKaraProgram {
 	  xneu = startx;
 	  yneu = starty;
 	  
-	  for (i=0; i<100; i++){
-		  int xMerken,yMerken;
+	  for (int i=0; i<100; i++){
+		  float xMerken,yMerken;
 		  xMerken =xneu;
 		  yMerken =yneu;
 		  xneu = xNeuBerechnen (xMerken, yMerken, startx);
