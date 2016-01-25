@@ -30,7 +30,9 @@ public class Mandelbrot extends JavaKaraProgram {
     	  xInDerWelt = Breite - 1 - x;  
       }
       if (imKreis(xInDerWelt, y, MittelpunktX, MittelpunktY, Radius)){
-    	  kara.putLeaf();
+    	  if (reiseKomplettImKreis(xInDerWelt, y, MittelpunktX, MittelpunktY, Radius)) {
+    		  kara.putLeaf();
+    	  }
       }
       if (x < Breite -1) kara.move(); // nicht über den Rand laufen!!
     }
