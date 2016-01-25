@@ -68,7 +68,7 @@ public class Mandelbrot extends JavaKaraProgram {
 	  /*
 	   * 100 Mal die neuen Korrdinaten berechnen und prüfen, ob sie noch im Kreis sind. Dabei den Kreis auf Radius 2 normieren.
 	   */
-	  int xneu, yneu;
+	  float xneu, yneu;
 	  
 	  xneu = startx;
 	  yneu = starty;
