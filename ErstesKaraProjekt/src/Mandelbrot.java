@@ -34,7 +34,7 @@ public class Mandelbrot extends JavaKaraProgram {
       }
       if (x < Breite -1) kara.move(); // nicht über den Rand laufen!!
     }
-    if (y<Hoehe){
+    if (y<Hoehe){ // eine Zeile tiefer und in Gegenrichtung ausrichten
       if (nachRechts) {
         nachRechts = false;
         kara.turnRight();
@@ -68,18 +68,23 @@ public class Mandelbrot extends JavaKaraProgram {
 	  /*
 	   * 100 Mal die neuen Korrdinaten berechnen und prüfen, ob sie noch im Kreis sind. Dabei den Kreis auf Radius 2 normieren.
 	   */
-	  float xneu, yneu;
+	  float xneu, yneu; 				//nächster Punkt
+	  float xMerken,yMerken; 			// Ausgangspunkt für Berechnung des nächsten Punkts merken
+	  float Normierungsfaktor=Radius/2; //Berechnungsformel gilt für Radius = 2. Deswegen wird alles durch den Faktor geteilt
 	  
 	  xneu = startx;
 	  yneu = starty;
 	  
 	  for (int i=0; i<100; i++){
-		  float xMerken,yMerken;
-		  xMerken =xneu;
-		  yMerken =yneu;
-		  xneu = xNeuBerechnen (xMerken, yMerken, startx);
-		  yneu = yNeuBerechnen (xMerken, yMerken, starty);
+		  xMerken =xneu/Normierungsfaktor;
+		  yMerken =yneu/Normierungsfaktor;
+		  xneu = xNeuBerechnen (xMerken, yMerken, startx/Normierungsfaktor);
+		  yneu = yNeuBerechnen (xMerken, yMerken, starty/Normierungsfaktor);
+		  if (!imKreis(xneu, yneu, MittelpunktX/Normierungsfaktor, MittelpunktY/Normierungsfaktor, Radius/Normierungsfaktor)){
+			  return false;
+		  }
 	  }
+	  return true; // wir bis hier gekommen sind, dann waren alle Punkte im Kreis
   }
 
   public boolean imKreis (float WeltpunktX, float WeltpunktY, float MittelpunktX, float MittelpunktY, float Radius){
@@ -91,24 +96,13 @@ public class Mandelbrot extends JavaKaraProgram {
 
   boolean drin = true;
   float KoordinatenpunktX, KoordinatenpunktY =0;
-  float ab, c=0;
-
+  
   // Umrechnen einer Koordinate aus der Kara-Welt (Nullpunkt links oben) 
   // in ein Koordinatensystem mit Nullpunkt in der Mitte der Kara-Welt
   KoordinatenpunktX = WeltpunktX - MittelpunktX;
   KoordinatenpunktY = MittelpunktY - WeltpunktY;
   
   // Prüfen, ob der Koordinatenpunkt im Kreis liegt
-  
-  ab = KoordinatenpunktX*KoordinatenpunktX + KoordinatenpunktY*KoordinatenpunktY;
-  c = Radius*Radius;
-  /*
-  tools.showMessage("WeltX: " + WeltpunktX + " WeltY: " + WeltpunktY);
-  tools.showMessage("KoordX: " + KoordinatenpunktX + " KoordY: " + KoordinatenpunktY);
-  tools.showMessage("ab: " + ab + " c: " + c);
-  
-  tools.showMessage("WeltX: " + WeltpunktX + " WeltY: " + WeltpunktY + " KoordX: " + KoordinatenpunktX + " KoordY: " + KoordinatenpunktY + " ab: " + ab + " c: " + c);
-  */
   
   if ((KoordinatenpunktX*KoordinatenpunktX + KoordinatenpunktY*KoordinatenpunktY) > Radius*Radius){
 	  drin = false;
