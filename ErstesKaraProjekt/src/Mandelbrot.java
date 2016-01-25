@@ -74,12 +74,12 @@ public class Mandelbrot extends JavaKaraProgram {
 	  float xMerken,yMerken; 			// Ausgangspunkt für Berechnung des nächsten Punkts merken
 	  float Normierungsfaktor=Radius/2; //Berechnungsformel gilt für Radius = 2. Deswegen wird alles durch den Faktor geteilt
 	  
-	  xneu = startx;
-	  yneu = starty;
+	  xneu = startx/Normierungsfaktor;
+	  yneu = starty/Normierungsfaktor;
 	  
 	  for (int i=0; i<100; i++){
-		  xMerken =xneu/Normierungsfaktor;
-		  yMerken =yneu/Normierungsfaktor;
+		  xMerken =xneu;
+		  yMerken =yneu;
 		  xneu = xNeuBerechnen (xMerken, yMerken, startx/Normierungsfaktor);
 		  yneu = yNeuBerechnen (xMerken, yMerken, starty/Normierungsfaktor);
 		  if (!imKreis(xneu, yneu, MittelpunktX/Normierungsfaktor, MittelpunktY/Normierungsfaktor, Radius/Normierungsfaktor)){
