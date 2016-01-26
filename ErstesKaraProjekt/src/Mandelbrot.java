@@ -13,7 +13,8 @@ public class Mandelbrot extends JavaKaraProgram {
   public void weltAblaufen (int Breite, int Hoehe, float MittelpunktX, float MittelpunktY, float Radius){
 
   boolean nachRechts = true; // Schaut Kara nach rechts?
-  int xInDerWelt = 0; // x wird immer von 0 hoch gezählt. Wenn Kara nacht rechts läuft, anpassen. 
+  int xInDerWelt = 0; // x wird immer von 0 hoch gezählt. Wenn Kara nacht links läuft, anpassen.
+  java.awt.Point Position;
 
 
 // Kara in linke obere Ecke und nach rechtsschauend positionieren
@@ -21,16 +22,19 @@ public class Mandelbrot extends JavaKaraProgram {
   nachRechts = true;
   
 
-  for (int y=0; y < Hoehe; y++) {
-    for (int x=0; x < Breite; x++){
+  for (int y=0; y < Hoehe; y++) { // f�r jede Zeile
+    for (int x=0; x < Breite; x++){ // f�r jede Spalte
       if (nachRechts){
     	  xInDerWelt = x;
       }
       else {
-    	  xInDerWelt = Breite - 1 - x;  
+    	  xInDerWelt = Breite - 1 - x;  // von Rechts nach Links runterz�hlen
       }
-      if (imKreis(xInDerWelt, y, MittelpunktX, MittelpunktY, Radius)){
-    	  if (reiseKomplettImKreis(xInDerWelt, y, MittelpunktX, MittelpunktY, Radius)) {
+      
+      // Umrechnen der KaraPosition in Position im Koordinatenkreuz
+      Position = transformiereKoordinaten((float) xInDerWelt, (float) y, MittelpunktX, MittelpunktY);
+      if (imKreis((float)Position.getX(), (float)Position.getY(), MittelpunktX, MittelpunktY, Radius)){
+    	  if (reiseKomplettImKreis((float)Position.getX(), (float)Position.getY(), MittelpunktX, MittelpunktY, Radius)) {
     		  kara.putLeaf();
     	  }
       }
@@ -51,6 +55,25 @@ public class Mandelbrot extends JavaKaraProgram {
     }
   }
 }
+  public java.awt.Point transformiereKoordinaten (float karaX, float karaY, float MittelpunktX, float MittelpunktY){
+	  /*
+	   * Umrechnen einer Koordinate aus der Kara-Welt (Nullpunkt links oben) 
+	   * in ein Koordinatensystem mit Nullpunkt in der Mitte der Kara-Welt
+	   */
+
+	  float KoordinatenpunktX, KoordinatenpunktY =0;
+	  java.awt.Point NeueKoordinaten;
+	  NeueKoordinaten = new java.awt.Point(0,0);
+	  
+	  // Umrechnen einer Koordinate aus der Kara-Welt (Nullpunkt links oben) 
+	  // in ein Koordinatensystem mit Nullpunkt in der Mitte der Kara-Welt
+	  KoordinatenpunktX = karaX - MittelpunktX;
+	  KoordinatenpunktY = MittelpunktY - karaY;
+	  NeueKoordinaten.setLocation((double)KoordinatenpunktX, (double)KoordinatenpunktY);
+	  
+	  return NeueKoordinaten;
+
+  }
   
   public float xNeuBerechnen (float xalt, float yalt, float xstart){
 /* 
@@ -66,15 +89,17 @@ public class Mandelbrot extends JavaKaraProgram {
 	  return 2*xalt*yalt + ystart;
   }
   
-  public boolean reiseKomplettImKreis (int startx, int starty, float MittelpunktX, float MittelpunktY, float Radius){
+  public boolean reiseKomplettImKreis (float startx, float starty, float MittelpunktX, float MittelpunktY, float Radius){
 	  /*
 	   * 100 Mal die neuen Korrdinaten berechnen und prüfen, ob sie noch im Kreis sind. Dabei den Kreis auf Radius 2 normieren.
 	   */
-	  float xneu, yneu; 				//nächster Punkt
+	  float xneu, yneu; 				//n�chster Punkt
 	  float xMerken,yMerken; 			// Ausgangspunkt für Berechnung des nächsten Punkts merken
 	  float Normierungsfaktor=Radius/2; //Berechnungsformel gilt für Radius = 2. Deswegen wird alles durch den Faktor geteilt
 	  
 // hier ist der Fehler: die Koordinaten sind Kara-Koordinaten und müssen umgewandelt werden in Koordinaten mit Mittelpunkt (0,0)
+	  //Point.setLocaction(int,int)
+	  
 	  xneu = startx/Normierungsfaktor;
 	  yneu = starty/Normierungsfaktor;
 	  
@@ -90,7 +115,7 @@ public class Mandelbrot extends JavaKaraProgram {
 	  return true; // wir bis hier gekommen sind, dann waren alle Punkte im Kreis
   }
 
-  public boolean imKreis (float WeltpunktX, float WeltpunktY, float MittelpunktX, float MittelpunktY, float Radius){
+  public boolean imKreis (float PositionX, float PositionY, float MittelpunktX, float MittelpunktY, float Radius){
 /* Prüft, ob ein gegebner Punkt in der Welt im Kreis ist.
 ** Alle Punkte, die maximal die Länge Radius vom Mittelpunkt entfernt sind, sind im Kreis.
 ** Die Berechnung der Entfernung zum Mittelpunkt erfolgt über die Formel: a-quadrat + b-quadrat = c-quadrat,
@@ -98,20 +123,13 @@ public class Mandelbrot extends JavaKaraProgram {
 */
 
   boolean drin = true;
-  float KoordinatenpunktX, KoordinatenpunktY =0;
   
-  // Umrechnen einer Koordinate aus der Kara-Welt (Nullpunkt links oben) 
-  // in ein Koordinatensystem mit Nullpunkt in der Mitte der Kara-Welt
-  KoordinatenpunktX = WeltpunktX - MittelpunktX;
-  KoordinatenpunktY = MittelpunktY - WeltpunktY;
+  // Prüfen, ob die Position im Kreis liegt
   
-  // Prüfen, ob der Koordinatenpunkt im Kreis liegt
-  
-  if ((KoordinatenpunktX*KoordinatenpunktX + KoordinatenpunktY*KoordinatenpunktY) > Radius*Radius){
+  if ((PositionX*PositionX + PositionY*PositionY) > Radius*Radius){
 	  drin = false;
   }
 
-//  tools.showMessage("im Kreis: " + drin);
   return drin;
 
 }
@@ -132,14 +150,14 @@ public class Mandelbrot extends JavaKaraProgram {
   while (!karaStehtRichtig) {
     kara.move();
     karaPosition = kara.getPosition();
-    if (karaPosition.getY()!=0) {
+    if (karaPosition.y != 0) {
     // wir sind hoch oder runter gelaufen. Also zurück und einmal drehen
       kara.turnRight();
       kara.turnRight();
       kara.move();
       kara.turnRight();
     } else {
-      if (karaPosition.getX() != 1) {
+      if (karaPosition.x != 1) {
       // Wir sind nach links gelaufen. Also zweimal drehen und zurück
         kara.turnRight();
         kara.turnRight();
